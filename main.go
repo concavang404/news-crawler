@@ -139,6 +139,21 @@ func fetchPage(url string) (string, error) {
 
 // ── html text extractor ───────────────────────────────────────────────────────
 
+func nodeText(n *html.Node) string {
+	var sb strings.Builder
+	var collect func(*html.Node)
+	collect = func(n *html.Node) {
+		if n.Type == html.TextNode {
+			sb.WriteString(n.Data)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			collect(c)
+		}
+	}
+	collect(n)
+	return strings.TrimSpace(sb.String())
+}
+
 func extractText(body []byte) string {
 	doc, err := html.Parse(bytes.NewReader(body))
 	if err != nil {
@@ -156,12 +171,11 @@ func extractText(body []byte) string {
 		}
 
 		if n.Type == html.ElementNode && (n.Data == "p" || n.Data == "article") {
-			if n.FirstChild != nil && n.FirstChild.Type == html.TextNode {
-				text := strings.TrimSpace(n.FirstChild.Data)
-				if len(text) > 40 {
-					sb.WriteString(text + "\n")
-				}
+			text := nodeText(n)
+			if len(text) > 40 {
+				sb.WriteString(text + "\n")
 			}
+			return
 		}
 
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -176,6 +190,7 @@ func extractText(body []byte) string {
 // ── seen store ────────────────────────────────────────────────────────────────
 
 const seenFile = "seen.json"
+const maxSeen = 5000
 
 func loadSeen() map[string]bool {
 	seen := map[string]bool{}
@@ -197,6 +212,9 @@ func saveSeen(seen map[string]bool) {
 	ids := make([]string, 0, len(seen))
 	for id := range seen {
 		ids = append(ids, id)
+	}
+	if len(ids) > maxSeen {
+		ids = ids[len(ids)-maxSeen:]
 	}
 	data, _ := json.Marshal(ids)
 	os.WriteFile(seenFile, data, 0644)
@@ -396,7 +414,7 @@ func callGemini(apiKey, systemPrompt, userPrompt string) (string, error) {
 
 	b, _ := json.Marshal(body)
 	url := fmt.Sprintf(
-		"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=%s",
+		"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=%s",
 		apiKey,
 	)
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(b))
@@ -478,8 +496,6 @@ type article struct {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	// filter to single category if CATEGORY env is set
 	category := os.Getenv("CATEGORY")
 	targets := feeds
@@ -550,7 +566,9 @@ func main() {
 			continue
 		}
 
-		send(fmt.Sprintf("<b>%s — %d bài mới</b>", labels[cat], len(newItems)), cat)
+		if err := send(fmt.Sprintf("<b>%s — %d bài mới</b>", labels[cat], len(newItems)), cat); err != nil {
+			log.Printf("[%s] send header error: %v", cat, err)
+		}
 
 		for _, item := range newItems {
 			msg := fmt.Sprintf(
