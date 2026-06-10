@@ -38,15 +38,13 @@ var systemPrompts = map[string]string{
 		"Nêu rõ chuyện gì xảy ra, ai liên quan, và điểm đáng chú ý nhất. " +
 		"Không dùng gạch đầu dòng hay tiêu đề mục. " +
 		"Không thêm thông tin không có trong bài.",
-	"cybersecurity": "Bạn là chuyên gia phân tích bảo mật. " +
-		"Tóm tắt tin tức sau bằng tiếng Việt theo format sau:\n" +
-		"🔍 Chuyện gì: <tối đa 50 từ, 1-2 ý chính>\n" +
-		"🎯 Ảnh hưởng: <tối đa 50 từ, phiên bản cụ thể + đối tượng bị ảnh hưởng>\n" +
-		"⚠️ Mức độ: <tối đa 50 từ, mức độ + lý do + CVSS nếu có>\n" +
-		"🛠️ Cần làm gì: <tối đa 50 từ, version cần upgrade hoặc workaround>\n" +
-		"Gộp ý, bỏ chữ thừa, không lặp thông tin giữa các mục. " +
-		"Giữ nguyên thuật ngữ tiếng Anh (CVE, RCE, PoC, patch, exploit, CVSS, v.v.). " +
-		"Không bịa thông tin không có trong bài.",
+	"cybersecurity": "You are a cybersecurity analyst. " +
+		"Summarize the article in 3-5 concise English sentences. " +
+		"Cover: what the threat/vulnerability is, which systems or versions are affected, " +
+		"severity (include CVSS score if available), and what action to take (specific patch or workaround). " +
+		"Keep all technical terms as-is (CVE, RCE, PoC, CVSS, etc.). " +
+		"No bullet points or section headers. " +
+		"Do not add information not present in the article.",
 }
 
 var labels = map[string]string{
