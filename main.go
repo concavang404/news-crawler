@@ -34,15 +34,18 @@ var feeds = map[string][]string{
 
 var systemPrompts = map[string]string{
 	"vietnam": "Bạn là biên tập viên tin tức. " +
-		"Tóm tắt bài báo sau trong 3-5 câu bằng tiếng Việt tự nhiên, súc tích. " +
-		"Nêu rõ chuyện gì xảy ra, ai liên quan, và điểm đáng chú ý nhất. " +
+		"Tóm tắt bài báo sau trong 5-8 câu bằng tiếng Việt tự nhiên, đầy đủ chi tiết. " +
+		"Nêu rõ: chuyện gì xảy ra, ai liên quan, con số/dữ liệu cụ thể nếu có, " +
+		"nguyên nhân hoặc bối cảnh, và kết quả hoặc diễn biến tiếp theo. " +
 		"Không dùng gạch đầu dòng hay tiêu đề mục. " +
 		"Không thêm thông tin không có trong bài.",
 	"cybersecurity": "You are a cybersecurity analyst. " +
-		"Summarize the article in 3-5 concise English sentences. " +
-		"Cover: what the threat/vulnerability is, which systems or versions are affected, " +
-		"severity (include CVSS score if available), and what action to take (specific patch or workaround). " +
-		"Keep all technical terms as-is (CVE, RCE, PoC, CVSS, etc.). " +
+		"Summarize the article in 5-8 concise English sentences with full technical detail. " +
+		"Cover: what the threat/vulnerability is, attack vector and technique, " +
+		"which specific systems/versions/products are affected, who is behind it (if known), " +
+		"severity and CVSS score (if available), real-world impact or exploitation status, " +
+		"and exact remediation steps (specific patch version or workaround). " +
+		"Keep all technical terms as-is (CVE, RCE, PoC, CVSS, TTPs, IOCs, etc.). " +
 		"No bullet points or section headers. " +
 		"Do not add information not present in the article.",
 }
@@ -180,7 +183,7 @@ func extractText(body []byte) string {
 	}
 	walk(doc)
 
-	return truncate(sb.String(), 3000)
+	return truncate(sb.String(), 6000)
 }
 
 // ── seen store ────────────────────────────────────────────────────────────────
@@ -325,7 +328,7 @@ type groqResponse struct {
 func callGroq(apiKey, systemPrompt, userPrompt string) (string, error) {
 	body := groqRequest{
 		Model:     "llama-3.3-70b-versatile",
-		MaxTokens: 500,
+		MaxTokens: 800,
 		Messages: []groqMessage{
 			{Role: "system", Content: systemPrompt},
 			{Role: "user", Content: userPrompt},
@@ -404,7 +407,7 @@ func callGemini(apiKey, systemPrompt, userPrompt string) (string, error) {
 			{Parts: []geminiPart{{Text: userPrompt}}},
 		},
 		GenerationConfig: geminiGenConfig{
-			MaxOutputTokens: 400,
+			MaxOutputTokens: 800,
 		},
 	}
 
