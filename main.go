@@ -44,7 +44,7 @@ var systemPrompts = map[string]string{
 		"Cover: what the threat/vulnerability is, attack vector and technique, " +
 		"which specific systems/versions/products are affected, who is behind it (if known), " +
 		"severity and CVSS score (if available), real-world impact or exploitation status, " +
-		"and exact remediation steps (specific patch version or workaround) — only if the article mentions them. " +
+		"and remediation — only if the article mentions it: include specific patch version, upgrade path, or workaround. " +
 		"Keep all technical terms as-is (CVE, RCE, PoC, CVSS, TTPs, IOCs, etc.). " +
 		"No bullet points or section headers. " +
 		"Do not add information not present in the article.",
