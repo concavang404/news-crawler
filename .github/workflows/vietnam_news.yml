@@ -1,0 +1,42 @@
+name: Vietnam News Crawler
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # every hour
+  workflow_dispatch:
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore seen-articles cache
+        uses: actions/cache@v4
+        with:
+          path: seen.json
+          key: seen-articles-vn-${{ github.run_id }}
+          restore-keys: seen-articles-vn-
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Download deps
+        run: go mod tidy
+
+      - name: Build
+        run: go build -o crawler .
+
+      - name: Run
+        env:
+          CATEGORY:        vietnam
+          VN_BOT_TOKEN:    ${{ secrets.VN_BOT_TOKEN }}
+          VN_CHAT_ID:      ${{ secrets.VN_CHAT_ID }}
+          GROQ_API_KEY_1:  ${{ secrets.GROQ_API_KEY_1 }}
+          GROQ_API_KEY_2:  ${{ secrets.GROQ_API_KEY_2 }}
+          GROQ_API_KEY_3:  ${{ secrets.GROQ_API_KEY_3 }}
+          GEMINI_API_KEY_1: ${{ secrets.GEMINI_API_KEY_1 }}
+          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
+        run: ./crawler
