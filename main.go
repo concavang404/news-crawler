@@ -33,13 +33,11 @@ var feeds = map[string][]string{
 }
 
 var systemPrompts = map[string]string{
-	"vietnam": "Bạn là trợ lý tóm tắt tin tức. " +
-		"Tóm tắt tin tức sau bằng tiếng Việt theo format sau:\n" +
-		"📌 Sự kiện: <tối đa 50 từ, 1-2 ý chính về chuyện gì xảy ra>\n" +
-		"👥 Liên quan: <tối đa 50 từ, ai/tổ chức nào liên quan>\n" +
-		"📍 Bối cảnh: <tối đa 50 từ, khi nào/ở đâu/tại sao>\n" +
-		"Gộp ý, bỏ chữ thừa, không lặp thông tin giữa các mục. " +
-		"Không bịa thông tin không có trong bài.",
+	"vietnam": "Bạn là biên tập viên tin tức. " +
+		"Tóm tắt bài báo sau trong 3-5 câu bằng tiếng Việt tự nhiên, súc tích. " +
+		"Nêu rõ chuyện gì xảy ra, ai liên quan, và điểm đáng chú ý nhất. " +
+		"Không dùng gạch đầu dòng hay tiêu đề mục. " +
+		"Không thêm thông tin không có trong bài.",
 	"cybersecurity": "Bạn là chuyên gia phân tích bảo mật. " +
 		"Tóm tắt tin tức sau bằng tiếng Việt theo format sau:\n" +
 		"🔍 Chuyện gì: <tối đa 50 từ, 1-2 ý chính>\n" +
@@ -328,8 +326,8 @@ type groqResponse struct {
 
 func callGroq(apiKey, systemPrompt, userPrompt string) (string, error) {
 	body := groqRequest{
-		Model:     "llama-3.1-8b-instant",
-		MaxTokens: 400,
+		Model:     "llama-3.3-70b-versatile",
+		MaxTokens: 500,
 		Messages: []groqMessage{
 			{Role: "system", Content: systemPrompt},
 			{Role: "user", Content: userPrompt},
