@@ -7,7 +7,7 @@
 | Vietnam schedule | Every hour (`0 * * * *`) |
 | Cybersecurity schedule | Every hour (`0 * * * *`) |
 | Articles per feed per run | Max 5 |
-| Article content fed to LLM | 3,500 chars |
+| Article content fed to LLM | 4,000 chars |
 | Max output tokens (Groq & Gemini) | 800 |
 | Seen articles cap | 5,000 entries |
 

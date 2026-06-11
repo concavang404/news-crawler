@@ -183,7 +183,7 @@ func extractText(body []byte) string {
 	}
 	walk(doc)
 
-	return truncate(sb.String(), 3500)
+	return truncate(sb.String(), 4000)
 }
 
 // ── seen store ────────────────────────────────────────────────────────────────
